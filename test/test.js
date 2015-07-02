@@ -32,6 +32,10 @@ describe('HermiteInterpolation', function() {
       expect(hermite).to.be.an('object');
     });
 
+    it('is an instance of HermiteInterpolation', function () {
+      expect(hermite).to.be.an.instanceOf(HermiteInterpolation);
+    });
+
     describe('_orderDataByX', function() {
 
       it('orders the data by x property', function() {
@@ -45,8 +49,10 @@ describe('HermiteInterpolation', function() {
         expect(hermite.data).to.deep.equal([p1, p0]);
       });
 
+    });
 
-
+    it('has an "on" method', function () {
+      expect(hermite).to.have.property('on').to.be.a('function');
     });
 
   });

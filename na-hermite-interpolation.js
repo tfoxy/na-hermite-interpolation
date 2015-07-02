@@ -8,9 +8,13 @@
 module.exports = (function() {
   "use strict";
 
+  var events = require('events');
+
   function HermiteInterpolation() {
     this.data = [];
   }
+
+  HermiteInterpolation.prototype = Object.create(events.EventEmitter.prototype);
 
   HermiteInterpolation._dataCompareFn = function (left, right) {
     return left.x - right.x;
@@ -54,7 +58,7 @@ module.exports = (function() {
     var prevColumn = this._prevColumn;
     var result = (prevColumn[i + 1] - prevColumn[i]) / (data[j].x - data[i].x);
     this._column.push(result);
-    this.trigger('step', {i: i, j: j, result: result});
+    this.emit('step', {i: i, j: j, result: result});
   };
   */
 
