@@ -12,6 +12,7 @@ var chai = require('chai');
 var expect = chai.expect;
 
 var HermiteInterpolation = require('..');
+var Big = require('big.js');
 
 describe('HermiteInterpolation', function() {
   "use strict";
@@ -39,8 +40,8 @@ describe('HermiteInterpolation', function() {
     describe('_orderDataByX', function() {
 
       it('orders the data by x property', function() {
-        var p0 = {x: 2, y: 1};
-        var p1 = {x: 1, y: 2};
+        var p0 = {x: new Big(2), y: new Big(1)};
+        var p1 = {x: new Big(1), y: new Big(2)};
 
         hermite.data = [p0, p1];
 

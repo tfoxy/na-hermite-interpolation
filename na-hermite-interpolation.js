@@ -14,11 +14,12 @@ module.exports = (function() {
     this.data = [];
   }
 
-  HermiteInterpolation.prototype = Object.create(events.EventEmitter.prototype);
-
   HermiteInterpolation._dataCompareFn = function (left, right) {
-    return left.x - right.x;
+    return left.x.cmp(right.x);
   };
+
+
+  HermiteInterpolation.prototype = Object.create(events.EventEmitter.prototype);
 
   /*
   HermiteInterpolation.prototype.calculate = function (data) {
@@ -26,21 +27,19 @@ module.exports = (function() {
 
     this._prepareData();
     this._calculateResult();
-  };
-  */
+  };*/
 
   /*
   HermiteInterpolation.prototype._prepareData = function () {
     this._duplicatePointsWithDifferential();
     this._orderDataByX();
-  };
-  */
+  };*/
 
   /*
   HermiteInterpolation.prototype._duplicatePointsWithDifferential = function() {
     // TODO
-  };
-  */
+  };*/
+
 
   HermiteInterpolation.prototype._orderDataByX = function() {
     this.data.sort(HermiteInterpolation._dataCompareFn);
@@ -49,8 +48,7 @@ module.exports = (function() {
   /*
   HermiteInterpolation.prototype._calculateResult = function () {
     // TODO
-  };
-  */
+  };*/
 
   /*
   HermiteInterpolation.prototype._calculateStepResult = function(i, j) {
