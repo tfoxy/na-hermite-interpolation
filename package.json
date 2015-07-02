@@ -1,0 +1,28 @@
+{
+  "name": "na-hermite-interpolation",
+  "version": "0.0.1",
+  "description": "Hermite interpolation.",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tfoxy/na-hermite-interpolation"
+  },
+  "bugs": {
+    "url": "https://github.com/tfoxy/na-hermite-interpolation/issues"
+  },
+  "keywords": [
+    "hermite",
+    "interpolation",
+    "numerical",
+    "analysis",
+    "newton"
+  ],
+  "devDependencies": {
+    "mocha": "*",
+    "chai": "*"
+  },
+  "author": "Tomás Fox <tomas.c.fox@gmail.com>",
+  "license": "MIT"
+}
