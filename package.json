@@ -22,6 +22,7 @@
   "devDependencies": {
     "mocha": "*",
     "chai": "*",
+    "sinon": "*",
     "big.js": "*"
   },
   "author": "Tomás Fox <tomas.c.fox@gmail.com>",
