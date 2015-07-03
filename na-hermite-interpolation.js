@@ -55,6 +55,8 @@ module.exports = (function() {
     //noinspection JSUnresolvedFunction
     this.removeListener('step', stepListener);
 
+
+
     return coef;
   };
 
