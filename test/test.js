@@ -15,6 +15,7 @@ var assert = chai.assert;
 var sinon = require('sinon');
 
 var Big = require('big.js');
+require('bigjs-neg')(Big);
 
 var HermiteInterpolation = require('..');
 
@@ -53,11 +54,11 @@ describe('HermiteInterpolation', function() {
         var p0 = {x: new Big(2), y: new Big(1)};
         var p1 = {x: new Big(1), y: new Big(2)};
 
-        hermite.data = [p0, p1];
+        hermite._data = [p0, p1];
 
         hermite._orderDataByX();
 
-        expect(hermite.data).to.deep.equal([p1, p0]);
+        expect(hermite._data).to.deep.equal([p1, p0]);
       });
 
 
@@ -73,9 +74,10 @@ describe('HermiteInterpolation', function() {
 
 
       it('calculates only step[0,1] with 2 points', function () {
-        var p0 = {x: new Big(6), y: new Big(5)};
-        var p1 = {x: new Big(8), y: new Big(13)};
-        var data = [p0, p1];
+        hermite.data = [
+          {x: new Big(6), y: new Big(5)},
+          {x: new Big(8), y: new Big(13)}
+        ];
 
         var listener = sinon.spy(function(stepData) {
           expect(stepData).to.include({i: 0, j: 1});
@@ -83,16 +85,17 @@ describe('HermiteInterpolation', function() {
 
         hermite.on('step', listener);
 
-        hermite.calculateDividedDifferences(data);
+        hermite.calculateDividedDifferences();
 
         assert.isTrue(listener.calledOnce);
       });
 
 
       it('calculates correctly the divided difference with 2 points', function () {
-        var p0 = {x: new Big(6), y: new Big(5)};
-        var p1 = {x: new Big(8), y: new Big(13)};
-        var data = [p0, p1];
+        hermite.data = [
+          {x: new Big(6), y: new Big(5)},
+          {x: new Big(8), y: new Big(13)}
+        ];
 
         var listener = sinon.spy(function(stepData) {
           expect(stepData).to.have.property('result').to.deep.equal(new Big(4));
@@ -100,17 +103,18 @@ describe('HermiteInterpolation', function() {
 
         hermite.on('step', listener);
 
-        hermite.calculateDividedDifferences(data);
+        hermite.calculateDividedDifferences();
 
         assert.isTrue(listener.calledOnce);
       });
 
 
       it('calculates steps [0,1],[1,2],[0,2] with 3 points', function () {
-        var p0 = {x: new Big(6), y: new Big(5)};
-        var p1 = {x: new Big(8), y: new Big(13)};
-        var p2 = {x: new Big(14), y: new Big(-11)};
-        var data = [p0, p1, p2];
+        hermite.data = [
+          {x: new Big(6), y: new Big(5)},
+          {x: new Big(8), y: new Big(13)},
+          {x: new Big(14), y: new Big(-11)}
+        ];
 
         var spy01 = sinon.spy();
         var spy12 = sinon.spy();
@@ -128,7 +132,7 @@ describe('HermiteInterpolation', function() {
 
         hermite.on('step', listener);
 
-        hermite.calculateDividedDifferences(data);
+        hermite.calculateDividedDifferences();
 
         expect(listener.callCount).to.equals(3);
         assert.isTrue(spy01.calledOnce);
@@ -138,7 +142,7 @@ describe('HermiteInterpolation', function() {
 
 
       it('calculates correctly the divided differences with 4 points', function () {
-        var data = [
+        hermite.data = [
           {x: new Big(6), y: new Big(5)},
           {x: new Big(8), y: new Big(13)},
           {x: new Big(14), y: new Big(-11)},
@@ -158,9 +162,26 @@ describe('HermiteInterpolation', function() {
 
         hermite.on('step', listener);
 
-        hermite.calculateDividedDifferences(data);
+        hermite.calculateDividedDifferences();
 
         expect(listener.callCount).to.equal(6);
+      });
+
+
+      it('calculates correctly the divided difference with 1 point with differential', function () {
+        hermite.data = [
+          {x: new Big(6), y: new Big(5), d: new Big(3)}
+        ];
+
+        var listener = sinon.spy(function(stepData) {
+          expect(stepData).to.have.property('result').to.deep.equal(new Big(3));
+        });
+
+        hermite.on('step', listener);
+
+        hermite.calculateDividedDifferences();
+
+        assert.isTrue(listener.calledOnce);
       });
 
 
@@ -171,35 +192,102 @@ describe('HermiteInterpolation', function() {
 
 
       it('returns the coefficients of the polynomial (using 2 points)', function () {
-        var p0 = {x: new Big(6), y: new Big(5)};
-        var p1 = {x: new Big(8), y: new Big(13)};
-        var data = [p0, p1];
-        var coef = [new Big(5), new Big(4)];
+        hermite.data = [
+          {x: new Big(6), y: new Big(5)},
+          {x: new Big(8), y: new Big(13)}
+        ];
+        var preCoef = [new Big(5), new Big(4)];
+        var coef = [new Big(-19), new Big(4)];
 
-        expect(hermite.calculatePolynomialCoefficients(data)).to.deep.equal(coef);
+        var listener = sinon.spy(function (preCoefData) {
+          expect(preCoefData).to.deep.equal(preCoef);
+        });
+
+        hermite.on('preCoefficients', listener);
+
+        expect(hermite.calculatePolynomialCoefficients()).to.deep.equal(coef);
+
+        assert.isTrue(listener.calledOnce);
       });
 
 
       it('returns the coefficients of the polynomial (using 3 points)', function () {
-        var p0 = {x: new Big(6), y: new Big(5)};
-        var p1 = {x: new Big(8), y: new Big(13)};
-        var p2 = {x: new Big(14), y: new Big(-11)};
-        var data = [p0, p1, p2];
-        var coef = [new Big(5), new Big(4), new Big(-1)];
+        hermite.data = [
+          {x: new Big(6), y: new Big(5)},
+          {x: new Big(8), y: new Big(13)},
+          {x: new Big(14), y: new Big(-11)}
+        ];
+        var preCoef = [new Big(5), new Big(4), new Big(-1)];
+        var coef = [new Big(-67), new Big(18), new Big(-1)];
 
-        expect(hermite.calculatePolynomialCoefficients(data)).to.deep.equal(coef);
+        var listener = sinon.spy(function (preCoefData) {
+          expect(preCoefData).to.deep.equal(preCoef);
+        });
+
+        hermite.on('preCoefficients', listener);
+
+        expect(hermite.calculatePolynomialCoefficients()).to.deep.equal(coef);
+
+        assert.isTrue(listener.calledOnce);
       });
 
 
       it('returns the coefficients of the polynomial (using 4 points)', function () {
-        var p0 = {x: new Big(6), y: new Big(5)};
-        var p1 = {x: new Big(8), y: new Big(13)};
-        var p2 = {x: new Big(14), y: new Big(-11)};
-        var p3 = {x: new Big(15), y: new Big(41)};
-        var data = [p0, p1, p2, p3];
-        var coef = [new Big(5), new Big(4), new Big(-1), new Big(1)];
+        hermite.data = [
+          {x: new Big(6), y: new Big(5)},
+          {x: new Big(8), y: new Big(13)},
+          {x: new Big(14), y: new Big(-11)},
+          {x: new Big(15), y: new Big(41)}
+        ];
+        var preCoef = [new Big(5), new Big(4), new Big(-1), new Big(1)];
+        var coef = [new Big(-739), new Big(262), new Big(-29), new Big(1)];
 
-        expect(hermite.calculatePolynomialCoefficients(data)).to.deep.equal(coef);
+        var listener = sinon.spy(function (preCoefData) {
+          expect(preCoefData).to.deep.equal(preCoef);
+        });
+
+        hermite.on('preCoefficients', listener);
+
+        expect(hermite.calculatePolynomialCoefficients()).to.deep.equal(coef);
+
+        assert.isTrue(listener.calledOnce);
+      });
+
+
+    });
+
+
+    describe('_checkDuplicateX', function () {
+
+
+      it('throws an error if there are two points with the same x', function () {
+        hermite.data = [
+          {x: new Big(4), y: new Big(5)},
+          {x: new Big(4), y: new Big(7)}
+        ];
+
+        expect(hermite._checkDuplicateX.bind(hermite)).
+            to.throw(HermiteInterpolation.DuplicateError);
+      });
+
+
+    });
+
+
+    describe('_duplicatePointsWithDifferential', function() {
+
+
+      it('duplicates points ', function () {
+        var p0 = {x: new Big(4), y: new Big(5), d: new Big(3)},
+            p1 = {x: new Big(8), y: new Big(7)};
+
+        hermite.data = [p0, p1];
+
+        hermite._cloneData();
+
+        hermite._duplicatePointsWithDifferential();
+
+        expect(hermite._data).to.deep.equal([p0, p1, p0]);
       });
 
 
