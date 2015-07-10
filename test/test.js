@@ -66,7 +66,7 @@ describe('HermiteInterpolation', function() {
 
 
     it('has an "on" method', function () {
-      expect(hermite).to.have.property('on').to.be.a('function');
+      expect(hermite).to.have.property('on').that.is.a('function');
     });
 
 
@@ -260,7 +260,7 @@ describe('HermiteInterpolation', function() {
     describe('_checkDuplicateX', function () {
 
 
-      it('throws an error if there are two points with the same x', function () {
+      it('throws an error if there are two points with the same x', function() {
         hermite.data = [
           {x: new Big(4), y: new Big(5)},
           {x: new Big(4), y: new Big(7)}
@@ -268,6 +268,39 @@ describe('HermiteInterpolation', function() {
 
         expect(hermite._checkDuplicateX.bind(hermite)).
             to.throw(HermiteInterpolation.DuplicateError);
+      });
+
+
+      it('emits an error event if there is a listener', function() {
+        hermite.data = [
+          {x: new Big(4), y: new Big(5)},
+          {x: new Big(4), y: new Big(7)}
+        ];
+
+        var spy = sinon.spy();
+
+        hermite.on('error', spy);
+
+        hermite._checkDuplicateX();
+
+        assert.isTrue(spy.calledOnce);
+      });
+
+
+      it('emits a DuplicateError', function () {
+        hermite.data = [
+          {x: new Big(4), y: new Big(5)},
+          {x: new Big(4), y: new Big(7)}
+        ];
+
+        var spy = sinon.spy();
+
+        hermite.on('error', spy);
+
+        hermite._checkDuplicateX();
+
+        expect(spy.args).to.have.property(0).that.has.property(0).
+            that.is.an.instanceOf(HermiteInterpolation.DuplicateError);
       });
 
 

@@ -128,10 +128,11 @@ module.exports = (function() {
     this.data.forEach(function (point) {
       var x = JSON.stringify(point.x);
       if (x in set) {
-        throw new DuplicateError();
+        //noinspection JSUnresolvedFunction
+        this.emit('error', new DuplicateError());
       }
       set[x] = true;
-    });
+    }, this);
   };
 
 
