@@ -6,8 +6,6 @@
  * Released under the MIT license
  */
 
-//noinspection BadExpressionStatementJS
-
 var chai = require('chai');
 var expect = chai.expect;
 var assert = chai.assert;
