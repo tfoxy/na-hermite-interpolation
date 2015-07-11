@@ -1,7 +1,8 @@
 {
   "name": "na-hermite-interpolation",
   "version": "0.0.1",
-  "description": "Hermite interpolation.",
+  "description": "Hermite interpolation",
+  "main": "./na-hermite-interpolation",
   "scripts": {
     "test": "mocha"
   },
