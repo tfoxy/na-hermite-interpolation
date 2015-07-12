@@ -8,7 +8,7 @@
 
 /*global define*/
 
-(function (root, factory) {
+(function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module.
     define([], factory);
@@ -21,7 +21,7 @@
     // Browser globals (root is window)
     root.HermiteInterpolation = factory();
   }
-}(this, function () {
+}(this, function() {
   'use strict';
 
   var events = require('events');
@@ -43,7 +43,7 @@
     this._prevColumn = [];
   }
 
-  HermiteInterpolation._dataCompareFn = function (left, right) {
+  HermiteInterpolation._dataCompareFn = function(left, right) {
     return left.x.cmp(right.x);
   };
 
@@ -55,18 +55,18 @@
   HermiteInterpolation.prototype.constructor = HermiteInterpolation;
 
 
-  HermiteInterpolation.prototype.calculateDividedDifferences = function () {
+  HermiteInterpolation.prototype.calculateDividedDifferences = function() {
     this._prepareData();
     this._calculateDividedDifferences();
   };
 
 
-  HermiteInterpolation.prototype.calculatePolynomialCoefficients = function () {
+  HermiteInterpolation.prototype.calculatePolynomialCoefficients = function() {
     this._prepareData();
 
     var preCoef = [this._data[0].y];
 
-    var stepListener = function (stepData) {
+    var stepListener = function(stepData) {
       if (stepData.i === 0) {
         preCoef.push(stepData.result);
       }
@@ -87,22 +87,23 @@
   };
 
 
-  HermiteInterpolation.prototype._calculatePolynomialCoefficients = function (preCoef) {
+  HermiteInterpolation.prototype._calculatePolynomialCoefficients =
+      function(preCoef) {
     var coef = preCoef.slice();
 
     var tempCoef = [];
-    var x_i;
-    var fx_0i;
+    // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
+    var x_i, fx_0i;
 
-    var timesCoefFn = function (c) {
+    var timesCoefFn = function(c) {
       return c.times(x_i);
     };
 
-    var addAuxCoefFn = function (auxC, i) {
+    var addAuxCoefFn = function(auxC, i) {
       tempCoef[i + 1] = tempCoef[i + 1].plus(auxC);
     };
 
-    var addTempCoefFn = function (tempC, i) {
+    var addTempCoefFn = function(tempC, i) {
       coef[i] = fx_0i.times(tempC).plus(coef[i]);
     };
 
@@ -111,7 +112,7 @@
       // f(x[0], ..., x[i]) * tempCoef * (x - x[i-1])
 
       //noinspection JSUnresolvedFunction
-      x_i = this._data[i-1].x.neg();
+      x_i = this._data[i - 1].x.neg();
       fx_0i = preCoef[i];
       var auxCoef = tempCoef;
 
@@ -128,7 +129,7 @@
   };
 
 
-  HermiteInterpolation.prototype._prepareData = function () {
+  HermiteInterpolation.prototype._prepareData = function() {
     this._checkDuplicateX();
     this._cloneData();
     this._duplicatePointsWithDifferential();
@@ -137,10 +138,10 @@
   };
 
 
-  HermiteInterpolation.prototype._checkDuplicateX = function () {
+  HermiteInterpolation.prototype._checkDuplicateX = function() {
     var set = Object.create(null);
 
-    this.data.forEach(function (point) {
+    this.data.forEach(function(point) {
       var x = JSON.stringify(point.x);
       if (x in set) {
         //noinspection JSUnresolvedFunction
@@ -151,13 +152,13 @@
   };
 
 
-  HermiteInterpolation.prototype._cloneData = function () {
+  HermiteInterpolation.prototype._cloneData = function() {
     this._data = this.data.slice();
   };
 
 
   HermiteInterpolation.prototype._duplicatePointsWithDifferential = function() {
-    this.data.forEach(function (point) {
+    this.data.forEach(function(point) {
       if (point.d) {
         this._data.push(point);
       }
@@ -170,14 +171,14 @@
   };
 
 
-  HermiteInterpolation.prototype._initPrevColumn = function () {
-    this._data.forEach(function (point) {
+  HermiteInterpolation.prototype._initPrevColumn = function() {
+    this._data.forEach(function(point) {
       this._prevColumn.push(point.y);
     }, this);
   };
 
 
-  HermiteInterpolation.prototype._calculateDividedDifferences = function () {
+  HermiteInterpolation.prototype._calculateDividedDifferences = function() {
     for (var j = 1; j < this._data.length; j++) {
       for (var i = 0; i < this._data.length - j; i++) {
         this._calculateStepResult(i, i + j);
