@@ -18,8 +18,7 @@ require('bigjs-neg')(Big);
 var HermiteInterpolation = require('..');
 
 describe('HermiteInterpolation', function() {
-  "use strict";
-
+  'use strict';
 
   it('is a function', function () {
     expect(HermiteInterpolation).to.be.a('function');
@@ -120,12 +119,13 @@ describe('HermiteInterpolation', function() {
 
         var listener = sinon.spy(function(stepData) {
           var i = stepData.i, j = stepData.j;
-          if (i === 0 && j === 1)
+          if (i === 0 && j === 1) {
             spy01();
-          else if (i === 1 && j === 2)
+          } else if (i === 1 && j === 2) {
             spy12();
-          else if (i === 0 && j === 2)
+          } else if (i === 0 && j === 2) {
             spy02();
+          }
         });
 
         hermite.on('step', listener);
