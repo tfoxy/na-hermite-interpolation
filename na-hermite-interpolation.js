@@ -29,11 +29,9 @@
 
   function DuplicateError(message) {
     this.name = 'DuplicateError';
-    //noinspection JSUnusedGlobalSymbols
     this.message = message || 'Duplicate x value';
   }
   DuplicateError.prototype = Object.create(Error.prototype);
-  //noinspection JSUnusedGlobalSymbols
   DuplicateError.prototype.constructor = DuplicateError;
 
 
@@ -51,7 +49,6 @@
 
 
   HermiteInterpolation.prototype = Object.create(events.EventEmitter.prototype);
-  //noinspection JSUnusedGlobalSymbols
   HermiteInterpolation.prototype.constructor = HermiteInterpolation;
 
 
@@ -72,15 +69,12 @@
       }
     };
 
-    //noinspection JSUnresolvedFunction
     this.on('step', stepListener);
 
     this._calculateDividedDifferences();
 
-    //noinspection JSUnresolvedFunction
     this.removeListener('step', stepListener);
 
-    //noinspection JSUnresolvedFunction
     this.emit('preCoefficients', preCoef);
 
     return this._calculatePolynomialCoefficients(preCoef);
@@ -144,7 +138,6 @@
     this.data.forEach(function(point) {
       var x = JSON.stringify(point.x);
       if (x in set) {
-        //noinspection JSUnresolvedFunction
         this.emit('error', new DuplicateError());
       }
       set[x] = true;
@@ -204,7 +197,6 @@
 
     this._column.push(result);
 
-    //noinspection JSUnresolvedFunction
     this.emit('step', {i: i, j: j, result: result});
   };
 
