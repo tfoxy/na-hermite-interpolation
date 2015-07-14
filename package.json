@@ -18,7 +18,8 @@
     "interpolation",
     "numerical",
     "analysis",
-    "newton"
+    "newton",
+    "polynomial"
   ],
   "devDependencies": {
     "mocha": "*",
