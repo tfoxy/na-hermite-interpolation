@@ -15,16 +15,16 @@ hermite.data = [
 
 // Divided differences
 hermite.on('step', function(data) {
-  console.log('f[x_' + data.i + ',...,x_' + data.j + '] = ' data.result);
+  console.log('f[x_' + data.i + ',...,x_' + data.j + '] = ' + data.result);
 });
 
 var coefficients = hermite.calculatePolynomialCoefficients();
-console.log(coefficients); => [...]
+console.log(coefficients); // => [...]
 
 var polynomial = coefficients.map(function(coeff, i) {
   return coeff + ' x^' + i;
 }).join(' + ');
 
-console.log(polynomial); => a x^0 + b x^1 + c x^2 + d x^3
+console.log(polynomial); // => "a x^0 + b x^1 + c x^2 + d x^3"
 
 ````
