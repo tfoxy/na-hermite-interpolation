@@ -4,7 +4,8 @@
   "description": "Generates hermite polynomials",
   "main": "./na-hermite-interpolation",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "browserify": "browserify -s HermiteInterpolation na-hermite-interpolation.js -o na-hermite-interpolation-browser.js"
   },
   "repository": {
     "type": "git",
