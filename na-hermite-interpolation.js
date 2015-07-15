@@ -6,6 +6,12 @@
  * Released under the MIT license
  */
 
+/**
+ * Numbers must have the following methods for the divided differences:
+ * cmp, minus, div
+ * Additionally, to calculate the polynomial coefficients:
+ * plus, times, neg
+ */
 module.exports = (function() {
   'use strict';
 
@@ -173,11 +179,12 @@ module.exports = (function() {
 
   HermiteInterpolation.prototype._calculateStepResult = function(i, j) {
     var result;
-    var divisor = this._data[j].x.minus(this._data[i].x);
+    var xI = this._data[i].x, xJ = this._data[j].x;
 
-    if (HermiteInterpolation._isZero(divisor)) {
+    if (xI.cmp(xJ) === 0) {
       result = this._data[i].d;
     } else {
+      var divisor = xJ.minus(xI);
       var dividend = this._prevColumn[i + 1].minus(this._prevColumn[i]);
       result = dividend.div(divisor);
     }
@@ -185,11 +192,6 @@ module.exports = (function() {
     this._column.push(result);
 
     this.emit('step', {i: i, j: j, result: result});
-  };
-
-
-  HermiteInterpolation._isZero = function(number) {
-    return !!number.c && number.c[0] === 0;
   };
 
 
