@@ -110,6 +110,8 @@ module.exports = (function() {
           tempCoef.forEach(addTempCoefFn);
         }
 
+        this.emit('coefficients', coef);
+
         return coef;
       };
 
