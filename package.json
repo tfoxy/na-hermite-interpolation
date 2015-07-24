@@ -1,6 +1,6 @@
 {
   "name": "na-hermite-interpolation",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Generates hermite polynomials",
   "main": "./na-hermite-interpolation",
   "scripts": {
