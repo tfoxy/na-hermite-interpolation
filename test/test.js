@@ -209,6 +209,25 @@ describe('HermiteInterpolation', function() {
       });
 
 
+      it('emits the "coefficients" event with the coefficients', function() {
+        hermite.data = [
+          {x: new Big(6), y: new Big(5)},
+          {x: new Big(8), y: new Big(13)}
+        ];
+        var coef = [new Big(-19), new Big(4)];
+
+        var listener = sinon.spy(function(coefData) {
+          expect(coefData).to.deep.equal(coef);
+        });
+
+        hermite.on('coefficients', listener);
+
+        hermite.calculatePolynomialCoefficients();
+
+        assert.isTrue(listener.calledOnce);
+      });
+
+
       it('returns the coefficients of the polynomial (using 3 points)', function() {
         hermite.data = [
           {x: new Big(6), y: new Big(5)},
