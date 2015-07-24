@@ -5,7 +5,8 @@
   "main": "./na-hermite-interpolation",
   "scripts": {
     "test": "mocha",
-    "browserify": "browserify -s HermiteInterpolation na-hermite-interpolation.js -o dist/na-hermite-interpolation.js"
+    "browserify": "browserify -s HermiteInterpolation na-hermite-interpolation.js -o dist/na-hermite-interpolation.js",
+    "min": "uglifyjs dist/na-hermite-interpolation.js --comments '/^!/' --compress --mangle -o dist/na-hermite-interpolation.min.js"
   },
   "repository": {
     "type": "git",
