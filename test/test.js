@@ -324,20 +324,34 @@ describe('HermiteInterpolation', function() {
     });
 
 
-    describe('_duplicatePointsWithDifferential', function() {
+    describe('_multiplyPointsWithDifferential', function() {
 
 
-      it('duplicates points ', function() {
-        var p0 = {x: new Big(4), y: new Big(5), d: new Big(3)},
-            p1 = {x: new Big(8), y: new Big(7)};
+      it('duplicates points with a differential', function() {
+        var p0 = {x: new Big(4), y: new Big(5), d: [new Big(3)]},
+            p1 = {x: new Big(8), y: new Big(7), d: []};
 
         hermite.data = [p0, p1];
 
         hermite._cloneData();
 
-        hermite._duplicatePointsWithDifferential();
+        hermite._multiplyPointsWithDifferential();
 
         expect(hermite._data).to.deep.equal([p0, p1, p0]);
+      });
+
+
+      it('triplicates points with two differentials', function() {
+        var p0 = {x: new Big(4), y: new Big(5), d: [new Big(3), new Big(4)]},
+            p1 = {x: new Big(8), y: new Big(7), d: []};
+
+        hermite.data = [p0, p1];
+
+        hermite._cloneData();
+
+        hermite._multiplyPointsWithDifferential();
+
+        expect(hermite._data).to.deep.equal([p0, p1, p0, p0]);
       });
 
 
