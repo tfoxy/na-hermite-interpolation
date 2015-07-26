@@ -70,6 +70,19 @@ describe('HermiteInterpolation', function() {
     describe('calculateDividedDifferences', function() {
 
 
+      it('does not calculate anything if there are no points', function() {
+        hermite.data = [];
+
+        var listener = sinon.spy();
+
+        hermite.on('step', listener);
+
+        hermite.calculateDividedDifferences();
+
+        assert.isTrue(listener.notCalled);
+      });
+
+
       it('calculates only step[0,1] with 2 points', function() {
         hermite.data = [
           {x: new Big(6), y: new Big(5)},
@@ -211,6 +224,13 @@ describe('HermiteInterpolation', function() {
 
 
     describe('calculatePolynomialCoefficients', function() {
+
+
+      it('returns an empty array if there is no data', function() {
+        hermite.data = [];
+
+        expect(hermite.calculatePolynomialCoefficients()).to.deep.equal([]);
+      });
 
 
       it('returns the coefficients of the polynomial (using 2 points)', function() {
