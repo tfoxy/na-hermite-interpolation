@@ -153,7 +153,7 @@ module.exports = (function() {
     this.data.forEach(function(point, i) {
       var x = JSON.stringify(point.x);
       if (x in set) {
-        this.emit('error', new DuplicateError(x, set[x], i));
+        this.emit('error', new DuplicateError(point.x, set[x], i));
       }
       set[x] = i;
     }, this);

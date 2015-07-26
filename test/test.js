@@ -354,14 +354,34 @@ describe('HermiteInterpolation', function() {
           {x: new Big(4), y: new Big(7)}
         ];
 
-        var spy = sinon.spy();
+        var listener = sinon.spy();
 
-        hermite.on('error', spy);
+        hermite.on('error', listener);
 
         hermite._checkDuplicateX();
 
-        expect(spy.args).to.have.property(0).that.has.property(0).
+        expect(listener.args).to.have.property(0).that.has.property(0).
             that.is.an.instanceOf(HermiteInterpolation.DuplicateError);
+      });
+
+
+      it('emits a DuplicateError with duplicateValue, firstIndex and secondIndex', function() {
+        hermite.data = [
+          {x: new Big(4), y: new Big(5)},
+          {x: new Big(4), y: new Big(7)}
+        ];
+
+        var listener = sinon.spy(function(error) {
+          expect(error.duplicateValue).to.deep.equal(new Big(4));
+          expect(error.firstIndex).to.equals(0);
+          expect(error.secondIndex).to.equals(1);
+        });
+
+        hermite.on('error', listener);
+
+        hermite._checkDuplicateX();
+
+        assert.isTrue(listener.calledOnce);
       });
 
 
