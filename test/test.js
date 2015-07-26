@@ -183,6 +183,30 @@ describe('HermiteInterpolation', function() {
       });
 
 
+      it('calculates correctly the divided differences of 1 point' +
+          ' with differentials of order 1 and 2', function() {
+        hermite.data = [
+          {x: new Big(6), y: new Big(5), d: [new Big(3), new Big(8)]}
+        ];
+
+        var listener = sinon.spy(function(stepData) {
+          if (stepData.j - stepData.i === 1) {
+            expect(stepData).to.have.property('result').to.deep.equal(new Big(3));
+          } else if (stepData.j - stepData.i === 2) {
+            expect(stepData).to.have.property('result').to.deep.equal(new Big(4));
+          } else {
+            assert.fail(stepData.j - stepData.i, 2, 'j - i > 2');
+          }
+        });
+
+        hermite.on('step', listener);
+
+        hermite.calculateDividedDifferences();
+
+        assert.isTrue(listener.calledThrice);
+      });
+
+
     });
 
 
