@@ -47,6 +47,10 @@ module.exports = (function() {
 
 
   HermiteInterpolation.prototype.calculateDividedDifferences = function() {
+    if (this.data.length === 0) {
+      return;
+    }
+
     this._prepareData();
     this._calculateDividedDifferences();
     this._cleanUp();
@@ -54,6 +58,10 @@ module.exports = (function() {
 
 
   HermiteInterpolation.prototype.calculatePolynomialCoefficients = function() {
+    if (this.data.length === 0) {
+      return [];
+    }
+
     this._prepareData();
 
     var preCoef = [this._data[0].y];
