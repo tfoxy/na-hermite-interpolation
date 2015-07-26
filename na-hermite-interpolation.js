@@ -19,9 +19,10 @@ module.exports = (function() {
   var events = require('events');
 
 
-  function DuplicateError(message) {
+  function DuplicateError(duplicateValue) {
     this.name = 'DuplicateError';
-    this.message = message || 'Duplicate x value';
+    this.message = 'Duplicate x value: ' + duplicateValue;
+    this.duplicateValue = duplicateValue;
   }
   DuplicateError.prototype = Object.create(Error.prototype);
   DuplicateError.prototype.constructor = DuplicateError;
@@ -147,7 +148,7 @@ module.exports = (function() {
     this.data.forEach(function(point) {
       var x = JSON.stringify(point.x);
       if (x in set) {
-        this.emit('error', new DuplicateError());
+        this.emit('error', new DuplicateError(x));
       }
       set[x] = true;
     }, this);
