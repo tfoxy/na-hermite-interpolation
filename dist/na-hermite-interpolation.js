@@ -1,6 +1,6 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.HermiteInterpolation = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /*!
- * na-hermite-interpolation
+ * na-hermite-interpolation v0.3.0
  * https://github.com/tfoxy/na-hermite-interpolation
  *
  * Copyright 2015 Tomás Fox
@@ -12,6 +12,7 @@
  * cmp, minus, div
  * Additionally, to calculate the polynomial coefficients:
  * plus, times, neg
+ * For differentials of order 2 or more, division must support javascript numbers
  */
 module.exports = (function() {
   'use strict';
@@ -19,9 +20,15 @@ module.exports = (function() {
   var events = require('events');
 
 
-  function DuplicateError(message) {
+  function DuplicateError(duplicateValue, firstIndex, secondIndex) {
     this.name = 'DuplicateError';
-    this.message = message || 'Duplicate x value';
+    this.message = 'Duplicate value at x' + firstIndex +
+        ' and x' + secondIndex +
+        '. Value: ' + duplicateValue;
+
+    this.duplicateValue = duplicateValue;
+    this.firstIndex = firstIndex;
+    this.secondIndex = secondIndex;
   }
   DuplicateError.prototype = Object.create(Error.prototype);
   DuplicateError.prototype.constructor = DuplicateError;
@@ -31,6 +38,9 @@ module.exports = (function() {
     this.data = [];
     this._column = [];
     this._prevColumn = [];
+    this._data = [];
+    this._currentFactorialResult = 1;
+    this._currentFactorialFactor = 1;
   }
 
   HermiteInterpolation._dataCompareFn = function(left, right) {
@@ -45,12 +55,21 @@ module.exports = (function() {
 
 
   HermiteInterpolation.prototype.calculateDividedDifferences = function() {
+    if (this.data.length === 0) {
+      return;
+    }
+
     this._prepareData();
     this._calculateDividedDifferences();
+    this._cleanUp();
   };
 
 
   HermiteInterpolation.prototype.calculatePolynomialCoefficients = function() {
+    if (this.data.length === 0) {
+      return [];
+    }
+
     this._prepareData();
 
     var preCoef = [this._data[0].y];
@@ -73,54 +92,55 @@ module.exports = (function() {
   };
 
 
-  HermiteInterpolation.prototype._calculatePolynomialCoefficients =
-      function(preCoef) {
-        var coef = preCoef.slice();
+  HermiteInterpolation.prototype._calculatePolynomialCoefficients = function(preCoef) {
+    var coef = preCoef.slice();
 
-        var tempCoef = [];
-        // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
-        var x_i, fx_0i;
+    var tempCoef = [];
+    // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
+    var x_i, fx_0i;
 
-        var timesCoefFn = function(c) {
-          return c.times(x_i);
-        };
+    var timesCoefFn = function(c) {
+      return c.times(x_i);
+    };
 
-        var addAuxCoefFn = function(auxC, i) {
-          tempCoef[i + 1] = tempCoef[i + 1].plus(auxC);
-        };
+    var addAuxCoefFn = function(auxC, i) {
+      tempCoef[i + 1] = tempCoef[i + 1].plus(auxC);
+    };
 
-        var addTempCoefFn = function(tempC, i) {
-          coef[i] = fx_0i.times(tempC).plus(coef[i]);
-        };
+    var addTempCoefFn = function(tempC, i) {
+      coef[i] = fx_0i.times(tempC).plus(coef[i]);
+    };
 
 
-        for (var i = 1; i < coef.length; i++) {
-          // f(x[0], ..., x[i]) * tempCoef * (x - x[i-1])
+    for (var i = 1; i < coef.length; i++) {
+      // f(x[0], ..., x[i]) * tempCoef * (x - x[i-1])
 
-          //noinspection JSUnresolvedFunction
-          x_i = this._data[i - 1].x.neg();
-          fx_0i = preCoef[i];
-          var auxCoef = tempCoef;
+      //noinspection JSUnresolvedFunction
+      x_i = this._data[i - 1].x.neg();
+      fx_0i = preCoef[i];
+      var auxCoef = tempCoef;
 
-          tempCoef = auxCoef.map(timesCoefFn);
+      tempCoef = auxCoef.map(timesCoefFn);
 
-          tempCoef.push(x_i);
+      tempCoef.push(x_i);
 
-          auxCoef.forEach(addAuxCoefFn);
+      auxCoef.forEach(addAuxCoefFn);
 
-          tempCoef.forEach(addTempCoefFn);
-        }
+      tempCoef.forEach(addTempCoefFn);
+    }
 
-        this.emit('coefficients', coef);
+    this.emit('coefficients', coef);
 
-        return coef;
-      };
+    this._cleanUp();
+
+    return coef;
+  };
 
 
   HermiteInterpolation.prototype._prepareData = function() {
     this._checkDuplicateX();
     this._cloneData();
-    this._duplicatePointsWithDifferential();
+    this._multiplyPointsWithDifferential();
     this._orderDataByX();
     this._initPrevColumn();
 
@@ -131,27 +151,42 @@ module.exports = (function() {
   HermiteInterpolation.prototype._checkDuplicateX = function() {
     var set = Object.create(null);
 
-    this.data.forEach(function(point) {
+    this.data.forEach(function(point, i) {
       var x = JSON.stringify(point.x);
       if (x in set) {
-        this.emit('error', new DuplicateError());
+        this.emit('error', new DuplicateError(point.x, set[x], i));
       }
-      set[x] = true;
+      set[x] = i;
     }, this);
   };
 
 
   HermiteInterpolation.prototype._cloneData = function() {
-    this._data = this.data.slice();
+    this._data = this.data.map(function(point) {
+      var _point = {x: point.x, y: point.y};
+
+      if (!point.d) {
+        _point.d = [];
+      } else if (!Array.isArray(point.d)) {
+        _point.d = [point.d];
+      } else {
+        _point.d = point.d;
+      }
+
+      return _point;
+    });
   };
 
 
-  HermiteInterpolation.prototype._duplicatePointsWithDifferential = function() {
-    this.data.forEach(function(point) {
-      if (point.d) {
+  HermiteInterpolation.prototype._multiplyPointsWithDifferential = function() {
+    var length = this._data.length;
+
+    for (var i = 0; i < length; ++i) {
+      var point = this._data[i];
+      for (var j = 0; j < point.d.length; ++j) {
         this._data.push(point);
       }
-    }, this);
+    }
   };
 
 
@@ -185,7 +220,7 @@ module.exports = (function() {
     var xI = this._data[i].x, xJ = this._data[j].x;
 
     if (xI.cmp(xJ) === 0) {
-      result = this._data[i].d;
+      result = this._getDifferentialResult(this._data[i], j - i);
     } else {
       var divisor = xJ.minus(xI);
       var dividend = this._prevColumn[i + 1].minus(this._prevColumn[i]);
@@ -195,6 +230,31 @@ module.exports = (function() {
     this._column.push(result);
 
     this.emit('step', {i: i, j: j, result: result});
+  };
+
+
+  HermiteInterpolation.prototype._getDifferentialResult = function(point, order) {
+    if (order === 1) {
+      return point.d[0];
+    } else {
+      return point.d[order - 1].div(this._factorial(order));
+    }
+  };
+
+
+  HermiteInterpolation.prototype._factorial = function(differentialOrder) {
+    if (differentialOrder !== this._currentFactorialFactor) {
+      this._currentFactorialResult *= ++this._currentFactorialFactor;
+    }
+
+    return this._currentFactorialResult;
+  };
+
+
+  HermiteInterpolation.prototype._cleanUp = function() {
+    this._data = [];
+    this._currentFactorialResult = 1;
+    this._currentFactorialFactor = 1;
   };
 
 
