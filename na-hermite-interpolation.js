@@ -19,10 +19,15 @@ module.exports = (function() {
   var events = require('events');
 
 
-  function DuplicateError(duplicateValue) {
+  function DuplicateError(duplicateValue, firstIndex, secondIndex) {
     this.name = 'DuplicateError';
-    this.message = 'Duplicate x value: ' + duplicateValue;
+    this.message = 'Duplicate value at x' + firstIndex +
+        ' and x' + secondIndex +
+        '. Value: ' + duplicateValue;
+
     this.duplicateValue = duplicateValue;
+    this.firstIndex = firstIndex;
+    this.secondIndex = secondIndex;
   }
   DuplicateError.prototype = Object.create(Error.prototype);
   DuplicateError.prototype.constructor = DuplicateError;
@@ -145,12 +150,12 @@ module.exports = (function() {
   HermiteInterpolation.prototype._checkDuplicateX = function() {
     var set = Object.create(null);
 
-    this.data.forEach(function(point) {
+    this.data.forEach(function(point, i) {
       var x = JSON.stringify(point.x);
       if (x in set) {
-        this.emit('error', new DuplicateError(x));
+        this.emit('error', new DuplicateError(x, set[x], i));
       }
-      set[x] = true;
+      set[x] = i;
     }, this);
   };
 
