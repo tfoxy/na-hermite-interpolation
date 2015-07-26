@@ -1,5 +1,5 @@
 /*!
- * na-hermite-interpolation
+ * na-hermite-interpolation v0.3.0
  * https://github.com/tfoxy/na-hermite-interpolation
  *
  * Copyright 2015 Tomás Fox
@@ -11,6 +11,7 @@
  * cmp, minus, div
  * Additionally, to calculate the polynomial coefficients:
  * plus, times, neg
+ * For differentials of order 2 or more, division must support javascript numbers
  */
 module.exports = (function() {
   'use strict';
