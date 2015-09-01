@@ -2,6 +2,8 @@
 
 ## Usage example
 
+[Live Demo](http://jsbin.com/musoya/embed?js,console)
+
 ```js
 
 // If not executing on node.js and want to listen to events,
