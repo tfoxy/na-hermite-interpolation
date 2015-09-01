@@ -6,8 +6,8 @@
   "devDependencies": {},
   "ignore": [
     "**/*",
-    "!dist/na-hermite-interpolation.js",
-    "!dist/na-hermite-interpolation.min.js",
+    "!na-hermite-interpolation.js",
+    "!na-hermite-interpolation.min.js",
     "!LICENSE"
   ],
   "author": "Tomás Fox <tomas.c.fox@gmail.com>",
