@@ -1,5 +1,5 @@
 /*!
- * na-hermite-interpolation v0.4.1
+ * na-hermite-interpolation v0.4.2
  * https://github.com/tfoxy/na-hermite-interpolation
  *
  * Copyright 2015 Tomás Fox

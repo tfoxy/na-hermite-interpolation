@@ -1,6 +1,6 @@
 {
   "name": "na-hermite-interpolation",
-  "main": "./dist/na-hermite-interpolation.js",
+  "main": "./na-hermite-interpolation.js",
   "homepage": "https://github.com/tfoxy/na-hermite-interpolation",
   "dependencies": {},
   "devDependencies": {},
